@@ -580,7 +580,7 @@ class take_t {
     Seq seq_;
     Size n_;
 public:
-    constexpr take_t(const Seq &seq, Size n) noexcept(nothrow) : seq_(seq), n_(std::max(n, Size(0))) {}
+    constexpr take_t(Seq seq, Size n) noexcept(nothrow) : seq_(std::move(seq)), n_(std::max(n, Size(0))) {}
 
     [[nodiscard]] constexpr bool is_empty() const noexcept(nothrow) { return n_ == 0 || seq_.is_empty(); }
 
@@ -774,7 +774,7 @@ int main() {
         for (int i = 1; i <= 1000 * 1000 * 1000; ++i) res += i;
     });
     trace(res);
-    for (int n = 10; n <= 1000 * 1000; n *= 10) {
+    for (int n = 10; n <= 1000 * 1000 * 1000; n *= 10) {
         trace("\t#3:\t", n, " elements - lazy");
         measure([&res, n] {
             res = range(1, n) | reduce(std::plus<>()) | otherwise(0);
