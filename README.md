@@ -162,3 +162,23 @@ One of suggested (by me) solutions for enhancing lazy sequences is making them a
 *(Every iteration makes `n` calls where `n` is the number of aplied functions* 
 -> *As a result each call would be called not more often than once per `[buffer size]`).*
 * It would become more cache-friendly, because each call would proceed more data in the one place.
+
+---
+
+###Update
+
+Buffer tests added.
+
+* As it was expected, performance increased due to using buffers.
+* Details of benchmark are presented in `log.txt` and visualized in `Visualization.xlsx`.
+* Output of running with valgrind memcheck is in `valgrind.txt` *(reduced version of test because of speed reducing of valgrind)*.
+
+The test task was counting sum of numbers from `1` to `n` for different `n`s.
+* For eager sequences code was:
+```cpp
+int res = 0;
+for (int i = 0; i < n; ++i) {
+    res += i;
+}
+```
+* For lazy sequences different buffer sizes were tested *(details in the files)*.

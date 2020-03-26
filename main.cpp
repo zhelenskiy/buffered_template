@@ -514,6 +514,26 @@ struct lazy_iterator {
     }
 };
 
+template<class T, class = void>
+struct size_t_addable : std::false_type {
+    static T add(T item, size_t addition) {
+        while (addition) {
+            ++item;
+            --addition;
+        }
+        return item;
+    }
+};
+
+template<class T>
+struct size_t_addable<T, std::enable_if_t<std::is_constructible_v<T, decltype(std::declval<T>() +
+                                                                              std::declval<size_t>())>>>
+        : std::true_type {
+    static T add(const T &item, size_t addition) {
+        return item + addition;
+    }
+};
+
 
 template<class T, bool nothrow = false>
 class infinite_range_t;
@@ -526,6 +546,8 @@ template<class T, bool nothrow>
 class infinite_range_t {
     T start_;
 public:
+    static const bool can_have_buffer = size_t_addable<T>::value;
+
     constexpr explicit infinite_range_t(const T &start) noexcept(nothrow) : start_(start) {}
 
     [[nodiscard]] constexpr bool is_empty() const noexcept { return false; }
@@ -566,6 +588,18 @@ public:
     constexpr bool operator!=(const infinite_range_t &other) const noexcept(nothrow) {
         return !(*this == other);
     }
+
+    template<class Iter>
+    [[nodiscard]] std::tuple<size_t, std::optional<infinite_range_t>> set_buffer(Iter begin, size_t buffer_size) const {
+        static_assert(can_have_buffer);
+        auto seq = *this;
+        for (size_t done = 0; done < buffer_size; ++done, ++begin) {
+            *begin = *seq.head();
+            seq = *seq.tail();
+        }
+        return {buffer_size, seq};
+    }
+
 };
 
 template<class Seq, class Size, bool nothrow = false>
@@ -580,6 +614,7 @@ class take_t {
     Seq seq_;
     Size n_;
 public:
+
     constexpr take_t(Seq seq, Size n) noexcept(nothrow) : seq_(std::move(seq)), n_(std::max(n, Size(0))) {}
 
     [[nodiscard]] constexpr bool is_empty() const noexcept(nothrow) { return n_ == 0 || seq_.is_empty(); }
@@ -587,6 +622,8 @@ public:
     using value_type = typename Seq::value_type;
     using iterator_tag = typename Seq::iterator_tag;
     using const_iterator = lazy_iterator<take_t, nothrow>;
+
+    static const bool can_have_buffer = Seq::can_have_buffer;
 
     [[nodiscard]] constexpr const_iterator begin() const noexcept(nothrow) {
         return const_iterator{*this};
@@ -613,6 +650,13 @@ public:
     constexpr bool operator!=(const take_t &other) const noexcept(nothrow) {
         return !(*this == other);
     }
+
+    template<class Iter>
+    [[nodiscard]] std::tuple<size_t, std::optional<take_t>> set_buffer(Iter begin, size_t buffer_size) const {
+        static_assert(can_have_buffer);
+        auto[got, rest_inner] = seq_.set_buffer(begin, n_ > buffer_size ? buffer_size : (size_t) n_);
+        return {got, got < n_ ? (rest_inner | opt_fun(take(n_ - (Size) got))) : std::nullopt};
+    }
 };
 
 template<class Seq, class Mapper, bool nothrow = false>
@@ -637,9 +681,10 @@ public:
 
     [[nodiscard]] constexpr bool is_empty() const noexcept(nothrow) { return seq_.is_empty(); }
 
-    using value_type = typename Seq::value_type;
+    using value_type = std::invoke_result_t<Mapper, typename Seq::value_type>;
     using iterator_tag = typename Seq::iterator_tag;
     using const_iterator = lazy_iterator<map_t, nothrow>;
+    static const bool can_have_buffer = Seq::can_have_buffer;
 
     [[nodiscard]] constexpr const_iterator begin() const noexcept(nothrow) {
         return const_iterator{*this};
@@ -666,6 +711,29 @@ public:
 
     constexpr bool operator!=(const map_t &other) const noexcept(nothrow) {
         return !(*this == other);
+    }
+
+    template<class Iter>
+    [[nodiscard]] std::tuple<size_t, std::optional<map_t>> set_buffer(Iter begin, size_t buffer_size) const {
+        static_assert(can_have_buffer);
+        if constexpr (std::is_same_v<value_type, typename Seq::value_type>) {
+            auto[got, left_inner] = seq_.set_buffer(begin, buffer_size);
+            for (size_t index = 0; index < got; ++begin, ++index) {
+                *begin = mapper_(*begin);
+            }
+            return {got, left_inner | opt_fun(map(mapper_))};
+        } else {
+            thread_local std::vector<std::optional<typename Seq::value_type>> temp_buffer;
+            temp_buffer.assign(buffer_size, std::nullopt);
+
+            auto[got, left_inner] = seq_.set_buffer(temp_buffer.begin(), buffer_size);
+            for (size_t index = 0; index < got; ++begin, ++index) {
+                *begin = mapper_(*temp_buffer[index]);
+            }
+
+            temp_buffer.clear();
+            return {got, left_inner | opt_fun(map(mapper_))};
+        }
     }
 };
 
@@ -705,8 +773,18 @@ void measure(Action action) {
     trace("Time difference = ", std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count(), " ns");
 }
 
+template<class Action>
+void measureTable(Action action, size_t &cell) {
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    action();
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    cell += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+}
+
 #include <vector>
 #include <numeric>
+#include <map>
 
 int main() {
     trace("Testing composition");
@@ -774,7 +852,8 @@ int main() {
         for (int i = 1; i <= 1000 * 1000 * 1000; ++i) res += i;
     });
     trace(res);
-    for (int n = 10; n <= 1000 * 1000 * 1000; n *= 10) {
+    std::map<size_t, size_t> res_map;
+    for (size_t n = 10; n <= 1000 * 1000 * 1000 * 10ull; n *= 10) {
         trace("\t#3:\t", n, " elements - lazy");
         measure([&res, n] {
             res = range(1, n) | reduce(std::plus<>()) | otherwise(0);
@@ -786,7 +865,82 @@ int main() {
 //        std::vector<int> v(1000*1000);
             for (int i = 1; i <= n; ++i) res += i;
         });
+        res_map[n] = res;
         trace(res);
+        trace();
+    }
+    trace("Buffer examples");
+    std::array<int, 30> buffer{};
+    for (auto range_count : {12, 40, 0, 1, -1}) {
+        trace("Found for ", range_count, ":");
+        trace(std::get<0>((range(1, range_count) | map(fn1(item * 2))).set_buffer(buffer.begin(), buffer.size())));
+        for (auto item : buffer) std::cout << item << ' ';
+        trace();
+        trace(std::get<0>(
+                (range(1, range_count) | map(fn1(std::to_string(item))) | map(fn1(std::stoi(item)))).set_buffer(
+                        buffer.begin(), buffer.size())));
+        for (auto item : buffer) std::cout << item << ' ';
+        trace();
+    }
+    trace("Buffer performance");
+    std::vector<size_t> buffer_sizes = {1};
+    for (size_t n = 1; n < 100 * 1000; n *= 10)
+        range(2ull, 9ull) | foreach([&](auto item) { buffer_sizes.emplace_back(item * n); });
+    std::map<size_t, std::map<size_t, size_t >> count2size2time;
+    for (size_t n = 10; n <= 1000ull * 1000 * 1000ull * 10; n *= 10ull) {
+        trace("\tCurrent test: Items Count = ", n);
+        for (auto size : buffer_sizes) {
+            trace("\t\tCurrent test: Buffer size = ", size);
+            const size_t repeats = 10;
+            for (size_t repeat = 0; repeat < repeats; ++repeat) {
+                std::vector<size_t> perf_buf(size);
+//            trace("\t\tBuffer Size = ", size);
+                res = 0;
+                measureTable([n, &perf_buf, &res] {
+                    size_t got;
+                    std::optional seq = range(1, n);
+                    while (seq) {
+                        std::tie(got, seq) = seq->set_buffer(perf_buf.begin(), perf_buf.size());
+                        for (size_t i = 0; i < got; ++i) {
+                            res += perf_buf[i];
+                        }
+                    }
+                }, count2size2time[n][size]);
+                if (res_map[n] != res) {
+                    throw std::runtime_error("(res_map) " + std::to_string(res_map[n])
+                                             + " != (cur_res) " + std::to_string(res));
+                }
+//            trace("Result: ", res);
+//            trace();
+//            trace();
+            }
+            count2size2time[n][size] /= repeats;
+        }
+    }
+    auto writeFormatted = [](auto a, size_t len) {
+        std::string str;
+        if constexpr (std::is_constructible_v<std::string, decltype(a)>) {
+            str = a;
+        } else {
+            str = std::to_string(a);
+        }
+        std::cout << str;
+        range(0, len - str.length()) | foreach(fn1((void) (std::cout << ' ');));
+    };
+    writeFormatted("n\\size", 15);
+    for (auto &size : buffer_sizes) writeFormatted(size, 8);
+    trace();
+    auto timeToString = [](size_t ns) {
+        return ns >= 1e9 ? std::to_string(ns / 1000000000) + "s"
+                         : ns >= 1e6 ? std::to_string(ns / 1000000) + "ms"
+                                     : ns >= 1000 ? std::to_string(ns / 1000) + "mcs"
+                                                  : std::to_string(ns) + "ns";
+    };
+    for (auto&[count, size2time] : count2size2time) {
+        writeFormatted(count, 15);
+        for (auto[size, time]: size2time) {
+            writeFormatted(timeToString(time), 8);
+        }
         trace();
     }
     return 0;

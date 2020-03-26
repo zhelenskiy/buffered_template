@@ -1,0 +1,538 @@
+==5717== Memcheck, a memory error detector
+==5717== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==5717== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==5717== Command: ./buffered_template
+==5717== 
+Testing composition
+6
+8
+10
+12
+14
+Testing reduce
+10
+Performance tests:
+	#0:	Just range - lazy
+Time difference = 8598 ms
+Time difference = 8598058 µs
+Time difference = 8598058454 ns
+-243309312
+	#0:	Just range - eager (with storage)
+==5717== Warning: set address range perms: large range [0x59e43040, 0x1484f5840) (undefined)
+==5717== Warning: set address range perms: large range [0x59e43028, 0x1484f5858) (noaccess)
+Time difference = 10132 ms
+Time difference = 10132753 µs
+Time difference = 10132753379 ns
+-243309312
+	#0:	Just range - eager (without storage)
+Time difference = 3121 ms
+Time difference = 3121833 µs
+Time difference = 3121833810 ns
+-243309312
+	#1:	Big composition - lazy
+Time difference = 324 ms
+Time difference = 324153 µs
+Time difference = 324153904 ns
+	#1:	Big composition - eager (with storage, range loop)
+Time difference = 121 ms
+Time difference = 121130 µs
+Time difference = 121130413 ns
+-726379968
+	#1:	Big composition - eager (with storage, index loop)
+Time difference = 13 ms
+Time difference = 13833 µs
+Time difference = 13833228 ns
+-726379968
+	#2:	Big number of elements - lazy
+Time difference = 7608 ms
+Time difference = 7608235 µs
+Time difference = 7608235709 ns
+-243309312
+	#2:	Big number of elements - eager (max performance)
+Time difference = 3135 ms
+Time difference = 3135822 µs
+Time difference = 3135822700 ns
+-243309312
+	#3:	10 elements - lazy
+Time difference = 0 ms
+Time difference = 187 µs
+Time difference = 187903 ns
+55
+	#3:	10 elements - eager (max performance)
+Time difference = 0 ms
+Time difference = 218 µs
+Time difference = 218691 ns
+55
+
+	#3:	100 elements - lazy
+Time difference = 0 ms
+Time difference = 1 µs
+Time difference = 1901 ns
+5050
+	#3:	100 elements - eager (max performance)
+Time difference = 0 ms
+Time difference = 390 µs
+Time difference = 390328 ns
+5050
+
+	#3:	1000 elements - lazy
+Time difference = 0 ms
+Time difference = 5 µs
+Time difference = 5793 ns
+500500
+	#3:	1000 elements - eager (max performance)
+Time difference = 0 ms
+Time difference = 5 µs
+Time difference = 5977 ns
+500500
+
+	#3:	10000 elements - lazy
+Time difference = 0 ms
+Time difference = 44 µs
+Time difference = 44440 ns
+50005000
+	#3:	10000 elements - eager (max performance)
+Time difference = 0 ms
+Time difference = 33 µs
+Time difference = 33827 ns
+50005000
+
+	#3:	100000 elements - lazy
+Time difference = 0 ms
+Time difference = 447 µs
+Time difference = 447273 ns
+705082704
+	#3:	100000 elements - eager (max performance)
+Time difference = 0 ms
+Time difference = 325 µs
+Time difference = 325427 ns
+705082704
+
+	#3:	1000000 elements - lazy
+Time difference = 4 ms
+Time difference = 4301 µs
+Time difference = 4301051 ns
+1784293664
+	#3:	1000000 elements - eager (max performance)
+Time difference = 3 ms
+Time difference = 3278 µs
+Time difference = 3278605 ns
+1784293664
+
+	#3:	10000000 elements - lazy
+Time difference = 43 ms
+Time difference = 43250 µs
+Time difference = 43250601 ns
+-2004260032
+	#3:	10000000 elements - eager (max performance)
+Time difference = 32 ms
+Time difference = 32700 µs
+Time difference = 32700212 ns
+-2004260032
+
+	#3:	100000000 elements - lazy
+Time difference = 448 ms
+Time difference = 448234 µs
+Time difference = 448234360 ns
+987459712
+	#3:	100000000 elements - eager (max performance)
+Time difference = 328 ms
+Time difference = 328483 µs
+Time difference = 328483005 ns
+987459712
+
+	#3:	1000000000 elements - lazy
+Time difference = 4618 ms
+Time difference = 4618703 µs
+Time difference = 4618703076 ns
+-243309312
+	#3:	1000000000 elements - eager (max performance)
+Time difference = 3305 ms
+Time difference = 3305311 µs
+Time difference = 3305311429 ns
+-243309312
+
+	#3:	10000000000 elements - lazy
+Time difference = 44382 ms
+Time difference = 44382844 µs
+Time difference = 44382844067 ns
+-611454464
+	#3:	10000000000 elements - eager (max performance)
+Time difference = 33249 ms
+Time difference = 33249402 µs
+Time difference = 33249402041 ns
+-611454464
+
+Buffer examples
+Found for 12:
+12
+2 4 6 8 10 12 14 16 18 20 22 24 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+12
+1 2 3 4 5 6 7 8 9 10 11 12 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+Found for 40:
+30
+2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 
+30
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+Found for 0:
+0
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+0
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+Found for 1:
+1
+2 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+1
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+Found for -1:
+0
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+0
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 
+Buffer performance
+	Current test: Items Count = 10
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+	Current test: Items Count = 100
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+	Current test: Items Count = 1000
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+	Current test: Items Count = 10000
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+	Current test: Items Count = 100000
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+	Current test: Items Count = 1000000
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+	Current test: Items Count = 10000000
+		Current test: Buffer size = 1
+		Current test: Buffer size = 2
+		Current test: Buffer size = 3
+		Current test: Buffer size = 4
+		Current test: Buffer size = 5
+		Current test: Buffer size = 6
+		Current test: Buffer size = 7
+		Current test: Buffer size = 8
+		Current test: Buffer size = 9
+		Current test: Buffer size = 10
+		Current test: Buffer size = 20
+		Current test: Buffer size = 30
+		Current test: Buffer size = 40
+		Current test: Buffer size = 50
+		Current test: Buffer size = 60
+		Current test: Buffer size = 70
+		Current test: Buffer size = 80
+		Current test: Buffer size = 90
+		Current test: Buffer size = 100
+		Current test: Buffer size = 200
+		Current test: Buffer size = 300
+		Current test: Buffer size = 400
+		Current test: Buffer size = 500
+		Current test: Buffer size = 600
+		Current test: Buffer size = 700
+		Current test: Buffer size = 800
+		Current test: Buffer size = 900
+		Current test: Buffer size = 1000
+		Current test: Buffer size = 2000
+		Current test: Buffer size = 3000
+		Current test: Buffer size = 4000
+		Current test: Buffer size = 5000
+		Current test: Buffer size = 6000
+		Current test: Buffer size = 7000
+		Current test: Buffer size = 8000
+		Current test: Buffer size = 9000
+		Current test: Buffer size = 10000
+		Current test: Buffer size = 20000
+		Current test: Buffer size = 30000
+		Current test: Buffer size = 40000
+		Current test: Buffer size = 50000
+		Current test: Buffer size = 60000
+		Current test: Buffer size = 70000
+		Current test: Buffer size = 80000
+		Current test: Buffer size = 90000
+		Current test: Buffer size = 100000
+n\size         1       2       3       4       5       6       7       8       9       10      20      30      40      50      60      70      80      90      100     200     300     400     500     600     700     800     900     1000    2000    3000    4000    5000    6000    7000    8000    9000    10000   20000   30000   40000   50000   60000   70000   80000   90000   100000  
+10             40mcs   17mcs   6mcs    23mcs   6mcs    1mcs    1mcs    18mcs   962ns   938ns   927ns   938ns   938ns   948ns   934ns   935ns   931ns   940ns   926ns   937ns   942ns   944ns   961ns   959ns   982ns   982ns   979ns   980ns   1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    
+100            3mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    1mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    2mcs    
+1000           23mcs   16mcs   12mcs   18mcs   16mcs   15mcs   14mcs   14mcs   13mcs   13mcs   11mcs   10mcs   10mcs   10mcs   10mcs   10mcs   10mcs   10mcs   10mcs   10mcs   9mcs    9mcs    9mcs    9mcs    9mcs    9mcs    9mcs    9mcs    10mcs   10mcs   10mcs   10mcs   14mcs   20mcs   14mcs   11mcs   11mcs   14mcs   12mcs   10mcs   10mcs   10mcs   10mcs   10mcs   10mcs   10mcs   
+10000          230mcs  159mcs  121mcs  180mcs  159mcs  147mcs  134mcs  135mcs  130mcs  125mcs  107mcs  101mcs  99mcs   98mcs   96mcs   95mcs   115mcs  127mcs  130mcs  108mcs  91mcs   91mcs   91mcs   90mcs   90mcs   90mcs   91mcs   90mcs   90mcs   96mcs   92mcs   91mcs   91mcs   92mcs   91mcs   92mcs   92mcs   91mcs   92mcs   93mcs   91mcs   94mcs   92mcs   157mcs  93mcs   92mcs   
+100000         2ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     1ms     961mcs  948mcs  939mcs  935mcs  929mcs  909mcs  903mcs  899mcs  1ms     969mcs  898mcs  894mcs  897mcs  893mcs  897mcs  906mcs  909mcs  911mcs  910mcs  1ms     950mcs  913mcs  909mcs  909mcs  909mcs  910mcs  912mcs  911mcs  1ms     982mcs  914mcs  915mcs  
+1000000        23ms    16ms    12ms    18ms    16ms    15ms    13ms    14ms    13ms    12ms    11ms    10ms    10ms    9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     9ms     
+10000000       234ms   163ms   123ms   184ms   164ms   151ms   138ms   139ms   130ms   127ms   108ms   102ms   100ms   99ms    97ms    96ms    95ms    95ms    94ms    92ms    91ms    91ms    91ms    91ms    91ms    92ms    92ms    91ms    91ms    92ms    94ms    98ms    92ms    92ms    92ms    92ms    92ms    92ms    92ms    93ms    94ms    94ms    94ms    94ms    110ms   131ms   
+==5717== 
+==5717== HEAP SUMMARY:
+==5717==     in use at exit: 0 bytes in 0 blocks
+==5717==   total heap usage: 3,575 allocs, 3,575 frees, 4,344,093,072 bytes allocated
+==5717== 
+==5717== All heap blocks were freed -- no leaks are possible
+==5717== 
+==5717== For counts of detected and suppressed errors, rerun with: -v
+==5717== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
